@@ -9,7 +9,7 @@ export default function HeroSection() {
   const [theme, setTheme] = useState<Theme>("balanced");
   const [label, setLabel] = useState("");
   const [labelVisible, setLabelVisible] = useState(false);
-  const labelTimer = useRef<ReturnType<typeof setTimeout>>();
+  const labelTimer = useRef<ReturnType<typeof setTimeout>>(undefined);
 
   // Generate stars on mount
   useEffect(() => {
