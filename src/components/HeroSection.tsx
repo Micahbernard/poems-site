@@ -1,168 +1,122 @@
 "use client";
 
-import { useRef } from "react";
-import { motion, useScroll, useTransform } from "framer-motion";
+import { useEffect, useRef, useState } from "react";
 
-const titleWords = ["Written", "in", "the", "Stars"];
-
-const ease = [0.25, 0.1, 0.25, 1] as const;
+type Theme = "balanced" | "moon" | "sun";
 
 export default function HeroSection() {
-  const ref = useRef<HTMLElement>(null);
-  const { scrollYProgress } = useScroll({
-    target: ref,
-    offset: ["start start", "end start"],
-  });
+  const starsRef = useRef<HTMLDivElement>(null);
+  const [theme, setTheme] = useState<Theme>("balanced");
+  const [label, setLabel] = useState("");
+  const [labelVisible, setLabelVisible] = useState(false);
+  const labelTimer = useRef<ReturnType<typeof setTimeout>>();
 
-  const sunY = useTransform(scrollYProgress, [0, 1], [0, -180]);
-  const contentOpacity = useTransform(scrollYProgress, [0, 0.6], [1, 0]);
+  // Generate stars on mount
+  useEffect(() => {
+    const el = starsRef.current;
+    if (!el || el.children.length > 0) return;
+    for (let i = 0; i < 110; i++) {
+      const s = document.createElement("div");
+      s.className = "hero-star";
+      const size =
+        Math.random() < 0.85
+          ? 0.4 + Math.random() * 1
+          : 1.1 + Math.random() * 1.3;
+      s.style.cssText = `left:${Math.random() * 100}%;top:${Math.random() * 100}%;width:${size}px;height:${size}px;opacity:${0.1 + Math.random() * 0.45};`;
+      if (Math.random() < 0.25) {
+        s.style.animation = `hero-twinkle ${3 + Math.random() * 6}s ease-in-out ${Math.random() * 5}s infinite`;
+      }
+      el.appendChild(s);
+    }
+  }, []);
+
+  // Apply theme class on <body>
+  useEffect(() => {
+    document.body.classList.remove("theme-moon", "theme-sun");
+    if (theme === "moon") document.body.classList.add("theme-moon");
+    if (theme === "sun") document.body.classList.add("theme-sun");
+  }, [theme]);
+
+  function flash(txt: string) {
+    setLabel(txt);
+    setLabelVisible(true);
+    clearTimeout(labelTimer.current);
+    labelTimer.current = setTimeout(() => setLabelVisible(false), 2200);
+  }
+
+  function toggleTheme(t: "moon" | "sun") {
+    if (theme === t) {
+      setTheme("balanced");
+      flash("Balanced");
+    } else {
+      setTheme(t);
+      flash(t === "moon" ? "Lunar" : "Solar");
+    }
+  }
 
   return (
-    <section
-      ref={ref}
-      className="relative min-h-screen flex flex-col items-center justify-center overflow-hidden"
-    >
-      {/* ═══ THE SUN — massive smooth radial bloom, upper-right, bleeds toward center ═══ */}
-      <motion.div
-        className="absolute pointer-events-none"
-        style={{
-          top: "-200px",
-          right: "-100px",
-          width: "1200px",
-          height: "1200px",
-          y: sunY,
+    <section className="hero-scene">
+      {/* Stars */}
+      <div ref={starsRef} className="hero-stars" />
+
+      {/* ═══ MOON — left, centered vertically, partially off-screen ═══ */}
+      <div
+        className="hero-celestial hero-moon"
+        role="button"
+        aria-label="Lunar theme"
+        tabIndex={0}
+        onClick={() => toggleTheme("moon")}
+        onKeyDown={(e) => {
+          if (e.key === "Enter" || e.key === " ") {
+            e.preventDefault();
+            toggleTheme("moon");
+          }
         }}
       >
-        {/* Layer 8: outermost — bleeds past center */}
-        <div
-          className="absolute inset-0"
-          style={{
-            background: "radial-gradient(circle, rgba(230, 81, 0, 0.05) 0%, transparent 75%)",
-            filter: "blur(100px)",
-          }}
-        />
-        {/* Layer 7: deep amber */}
-        <div
-          className="absolute inset-[3%]"
-          style={{
-            background: "radial-gradient(circle, rgba(255, 111, 0, 0.07) 0%, transparent 68%)",
-            filter: "blur(80px)",
-          }}
-        />
-        {/* Layer 6: warm amber */}
-        <div
-          className="absolute inset-[8%]"
-          style={{
-            background: "radial-gradient(circle, rgba(255, 171, 0, 0.1) 0%, transparent 62%)",
-            filter: "blur(60px)",
-          }}
-        />
-        {/* Layer 5: golden */}
-        <div
-          className="absolute inset-[15%]"
-          style={{
-            background: "radial-gradient(circle, rgba(255, 213, 79, 0.15) 0%, transparent 58%)",
-            filter: "blur(45px)",
-          }}
-        />
-        {/* Layer 4: warm yellow */}
-        <div
-          className="absolute inset-[22%]"
-          style={{
-            background: "radial-gradient(circle, rgba(255, 249, 196, 0.2) 0%, transparent 52%)",
-            filter: "blur(30px)",
-          }}
-        />
-        {/* Layer 3: pale warm */}
-        <div
-          className="absolute inset-[30%]"
-          style={{
-            background: "radial-gradient(circle, rgba(255, 255, 240, 0.3) 0%, transparent 48%)",
-            filter: "blur(18px)",
-          }}
-        />
-        {/* Layer 2: bright white — pulsing */}
-        <motion.div
-          className="absolute inset-[36%]"
-          style={{
-            background: "radial-gradient(circle, rgba(255, 255, 255, 0.45) 0%, rgba(255, 255, 240, 0.15) 35%, transparent 60%)",
-            filter: "blur(8px)",
-          }}
-          animate={{ scale: [1, 1.08, 1], opacity: [0.85, 1, 0.85] }}
-          transition={{ duration: 7, repeat: Infinity, ease: "easeInOut" }}
-        />
-        {/* Layer 1: white-hot core */}
-        <motion.div
-          className="absolute inset-[42%]"
-          style={{
-            background: "radial-gradient(circle, rgba(255, 255, 255, 0.75) 0%, rgba(255, 255, 255, 0.3) 30%, transparent 65%)",
-            filter: "blur(3px)",
-          }}
-          animate={{ scale: [1, 1.06, 1] }}
-          transition={{ duration: 7, repeat: Infinity, ease: "easeInOut" }}
-        />
-      </motion.div>
+        <div className="hero-glow-layer moon-glow-ambient" />
+        <div className="hero-glow-layer moon-glow-outer" />
+        <div className="hero-glow-layer moon-glow-inner" />
+        <div className="hero-moon-body" />
+        <div className="hero-crescent-shadow" />
+      </div>
 
-      {/* ═══ TITLE — large and commanding ═══ */}
-      <motion.div
-        className="relative z-10 text-center px-6"
-        style={{ opacity: contentOpacity }}
+      {/* ═══ SUN — right, upper area, partially off-screen ═══ */}
+      <div
+        className="hero-celestial hero-sun"
+        role="button"
+        aria-label="Solar theme"
+        tabIndex={0}
+        onClick={() => toggleTheme("sun")}
+        onKeyDown={(e) => {
+          if (e.key === "Enter" || e.key === " ") {
+            e.preventDefault();
+            toggleTheme("sun");
+          }
+        }}
       >
-        <h1 className="flex flex-wrap justify-center gap-x-5 md:gap-x-7 text-6xl md:text-8xl lg:text-[8rem] font-semibold italic tracking-wide leading-tight">
-          {titleWords.map((word, i) => (
-            <motion.span
-              key={word}
-              className="inline-block"
-              style={{
-                color: "rgba(255, 252, 240, 0.95)",
-                textShadow:
-                  "0 0 40px rgba(255, 248, 225, 0.3), 0 0 80px rgba(255, 213, 79, 0.15), 0 0 120px rgba(176, 190, 197, 0.08)",
-              }}
-              initial={{ opacity: 0, y: 30 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 1.2, delay: 0.4 + i * 0.2, ease }}
-            >
-              {word}
-            </motion.span>
-          ))}
-        </h1>
+        <div className="hero-glow-layer sun-glow-ambient" />
+        <div className="hero-glow-layer sun-glow-outer" />
+        <div className="hero-glow-layer sun-glow-inner" />
+        <div className="hero-sun-body" />
+      </div>
 
-        <motion.p
-          className="mt-6 text-sm md:text-base tracking-[0.35em] uppercase font-light"
-          style={{ color: "rgba(240, 235, 227, 0.3)" }}
-          initial={{ opacity: 0, y: 12 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 1.6, duration: 1, ease }}
-        >
-          Love poems from my heart to yours
-        </motion.p>
+      {/* ═══ CONTENT ═══ */}
+      <div className="hero-content">
+        <h1 className="hero-title">Our love was written in the first moments of the universe</h1>
+        <p className="hero-subtitle">dedicated to mi amor, Eri, with all the love in every universe</p>
+        <div className="hero-divider" />
+      </div>
 
-        <motion.div
-          className="mt-8 w-32 h-[1px] mx-auto"
-          style={{ background: "linear-gradient(90deg, transparent, rgba(255, 252, 240, 0.12), transparent)" }}
-          initial={{ scaleX: 0 }}
-          animate={{ scaleX: 1 }}
-          transition={{ delay: 2, duration: 1.2, ease }}
-        />
-      </motion.div>
+      {/* Theme label */}
+      <div className={`hero-theme-label ${labelVisible ? "visible" : ""}`}>
+        {label}
+      </div>
 
-      {/* Scroll hint */}
-      <motion.div
-        className="absolute bottom-8 flex flex-col items-center gap-2 z-10"
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ delay: 2.8, duration: 1, ease }}
-      >
-        <span className="text-[9px] tracking-[0.5em] uppercase" style={{ color: "rgba(255, 252, 240, 0.12)" }}>
-          Scroll
-        </span>
-        <motion.div
-          className="w-[1px] h-5"
-          style={{ background: "linear-gradient(180deg, rgba(255, 252, 240, 0.12), transparent)" }}
-          animate={{ scaleY: [0.3, 1, 0.3], opacity: [0.1, 0.3, 0.1] }}
-          transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
-        />
-      </motion.div>
+      {/* Scroll indicator */}
+      <div className="hero-scroll-indicator">Scroll</div>
+
+      {/* Logo badge */}
+      <div className="hero-logo-badge">N</div>
     </section>
   );
 }

@@ -18,15 +18,14 @@ export default function StarField() {
   const layer3Ref = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    // Generate box-shadow star clusters on mount (client only)
     if (layer1Ref.current) {
-      layer1Ref.current.style.boxShadow = generateStarShadows(120, 2000);
+      layer1Ref.current.style.boxShadow = generateStarShadows(200, 2500);
     }
     if (layer2Ref.current) {
-      layer2Ref.current.style.boxShadow = generateStarShadows(60, 2000);
+      layer2Ref.current.style.boxShadow = generateStarShadows(100, 2500);
     }
     if (layer3Ref.current) {
-      layer3Ref.current.style.boxShadow = generateStarShadows(20, 2000);
+      layer3Ref.current.style.boxShadow = generateStarShadows(35, 2500);
     }
   }, []);
 

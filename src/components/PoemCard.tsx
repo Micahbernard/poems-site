@@ -8,19 +8,12 @@ interface PoemCardProps {
   index: number;
 }
 
-const ease = [0.25, 0.1, 0.25, 1] as const;
-
 export default function PoemCard({ poem, index }: PoemCardProps) {
   const isWarm = index % 2 === 0;
 
-  // Dual-lit box-shadows — warm gold from top, cool silver from bottom on ALL cards
-  const restShadow =
-    "0 -8px 40px rgba(255, 213, 79, 0.04), 0 8px 40px rgba(176, 190, 220, 0.04), 0 0 1px rgba(255, 255, 255, 0.06)";
-
-  const hoverShadow =
-    "0 -14px 70px rgba(255, 213, 79, 0.1), 0 14px 70px rgba(176, 190, 220, 0.1), 0 0 100px rgba(255, 213, 79, 0.04), 0 0 100px rgba(121, 134, 203, 0.04), 0 0 2px rgba(255, 255, 255, 0.1)";
-
-  const titleColor = isWarm ? "rgba(255, 235, 180, 0.9)" : "rgba(220, 225, 245, 0.9)";
+  const titleColor = isWarm
+    ? "rgba(255, 235, 180, 0.9)"
+    : "rgba(220, 225, 245, 0.9)";
 
   const titleShadow = isWarm
     ? "0 0 20px rgba(255, 213, 79, 0.15), 0 0 40px rgba(255, 213, 79, 0.06)"
@@ -41,18 +34,20 @@ export default function PoemCard({ poem, index }: PoemCardProps) {
       <motion.div
         className="relative rounded-2xl p-8 md:p-12 cursor-default"
         style={{
-          background: "rgba(255, 255, 255, 0.04)",
-          backdropFilter: "blur(24px)",
-          WebkitBackdropFilter: "blur(24px)",
-          border: "1px solid rgba(255, 255, 255, 0.08)",
-          boxShadow: restShadow,
+          background: "rgba(10, 8, 30, 0.45)",
+          backdropFilter: "blur(30px) saturate(1.5)",
+          WebkitBackdropFilter: "blur(30px) saturate(1.5)",
+          border: "1px solid rgba(255, 220, 150, 0.2)",
+          boxShadow:
+            "0 0 60px rgba(255, 190, 60, 0.08), 0 0 120px rgba(180, 200, 255, 0.05)",
         }}
         whileHover={{
           scale: 1.02,
-          boxShadow: hoverShadow,
-          borderColor: "rgba(255, 255, 255, 0.15)",
+          boxShadow:
+            "0 0 80px rgba(255, 190, 60, 0.15), 0 0 160px rgba(180, 200, 255, 0.1), 0 0 2px rgba(255, 220, 150, 0.3)",
+          borderColor: "rgba(255, 220, 150, 0.35)",
         }}
-        transition={{ duration: 0.4, ease }}
+        transition={{ duration: 0.4, ease: "easeOut" }}
       >
         <motion.h2
           className="text-2xl md:text-3xl font-semibold italic text-center mb-2 tracking-wide"
@@ -60,7 +55,7 @@ export default function PoemCard({ poem, index }: PoemCardProps) {
           initial={{ opacity: 0, y: 10 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          transition={{ duration: 0.5, delay: 0.1, ease }}
+          transition={{ duration: 0.5, delay: 0.1 }}
         >
           {poem.title}
         </motion.h2>
@@ -71,7 +66,7 @@ export default function PoemCard({ poem, index }: PoemCardProps) {
           initial={{ scaleX: 0 }}
           whileInView={{ scaleX: 1 }}
           viewport={{ once: true }}
-          transition={{ duration: 0.6, delay: 0.2, ease }}
+          transition={{ duration: 0.6, delay: 0.2 }}
         />
 
         <motion.p
@@ -80,7 +75,7 @@ export default function PoemCard({ poem, index }: PoemCardProps) {
           initial={{ opacity: 0 }}
           whileInView={{ opacity: 1 }}
           viewport={{ once: true }}
-          transition={{ duration: 0.8, delay: 0.2, ease }}
+          transition={{ duration: 0.8, delay: 0.2 }}
         >
           {poem.body}
         </motion.p>

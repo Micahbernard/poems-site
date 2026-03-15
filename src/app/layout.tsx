@@ -10,8 +10,8 @@ const cormorant = Cormorant_Garamond({
 });
 
 export const metadata: Metadata = {
-  title: "Written in the Stars",
-  description: "Love poems from my heart to yours",
+  title: "Our love was written in the first moments of the universe",
+  description: "dedicated to mi amor, Eri, with all the love in every universe",
 };
 
 export default function RootLayout({
